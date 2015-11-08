@@ -25,7 +25,7 @@ public class os {
 		
 	}
 	//interrupt Handlers
-	public static void Crint(int a, int[] p)
+	public static void Crint(int []a, int[] p)
 	{
 		/*indicates the arrival of a new job on the drum
 		 *at call: p[0] = job number
@@ -35,7 +35,7 @@ public class os {
 		 *p[4] = current time 
 		 */
 	}
-	public void Dskint(int a, int[]p)
+	public void Dskint(int []a, int[]p)
 	{
 		/*Disk interrupt
 		 * at call: p[4] = current time
@@ -43,14 +43,14 @@ public class os {
 		 */
 		
 	}
-	public void Drmint(int a, int []p)
+	public void Drmint(int []a, int []p)
 	{
 		/*
 		 * Drum interrupt
 		 * At call: p[4] = current time
 		 */
 	}
-	public void Tro(int a, int[]p)
+	public void Tro(int []a, int[]p)
 	{
 		/*
 		 * Timer-run-out
