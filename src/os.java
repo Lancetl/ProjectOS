@@ -29,7 +29,7 @@ public class os {
 
 	public static void startup(){
 		//sos.ontrace();
-		System.out.print("TEEEEEESSSSSSSSSTTTTTTT");
+		System.out.print("gittest");
 
 	}
 	
