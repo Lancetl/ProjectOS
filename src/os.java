@@ -30,7 +30,7 @@ public class os {
 
 	public static void startup(){
 		sos.ontrace();
-		System.out.print("gittest");
+		System.out.print("Long live our idols");
 
 	}
 	
