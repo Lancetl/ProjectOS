@@ -19,7 +19,7 @@ public class os {
 	 /*
 	  * array for memory management;
 	  */
-	 
+	 public static memoryLinkList memoryLink = new memoryLinkList();
 	 public static Vector<Integer> memory = new Vector(50);
 	 
 	 //freeSpaceTable implementation using hashtable
@@ -31,7 +31,7 @@ public class os {
 	public static void startup(){
 		sos.ontrace();
 		System.out.print("gittest");
-
+		memoryLink.createFirstLink(0,0,0, false);
 	}
 	
 	//Interrupt handlers
