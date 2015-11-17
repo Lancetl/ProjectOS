@@ -1,7 +1,8 @@
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Vector;
 import java.util.Hashtable;
-
+import java.math.*;
 
 public class os {
 		
@@ -19,19 +20,19 @@ public class os {
 	 /*
 	  * array for memory management;
 	  */
-	 public static memoryLinkList memoryLink = new memoryLinkList();
+	 public static LinkedList<memoryLink> memoryStorage = new LinkedList<memoryLink>();
+	 public static ArrayList<freeSpace> freeSpaceTable = new ArrayList<freeSpace>();
+	 
+	 
 	 public static Vector<Integer> memory = new Vector(50);
 	 
-	 //freeSpaceTable implementation using hashtable
-	 
-	// public static Hashtable<Integer, Integer>FreeSpaceTable = new Hashtable<Integer, Integer>();
-	 public static int memoryleft=100;
 	 
 
 	public static void startup(){
 		sos.ontrace();
 		System.out.print("gittest");
-		memoryLink.createFirstLink(0,0,0, false);
+		memoryLink first = new memoryLink(0,99,0,true, true);
+		memoryStorage.addFirst(first);
 	}
 	
 	//Interrupt handlers
@@ -89,7 +90,11 @@ public class os {
 	//methods called by OS only
 	
 	public static void MemoryManager( int []p){
-
+		
+		freeSpaceTableBuilder();
+		p[2] = addressFinder(p[3]);
+			
+		
 			Swap(p,0);
 			
 		}
@@ -98,4 +103,50 @@ public class os {
 	public static void Swap(int[] p, int k){
 		sos.siodrum(p[1], p[3], 0, 0);
 	}
+	
+	public static void freeSpaceTableBuilder(){
+			freeSpaceTable.clear();
+			
+			for(memoryLink temp : memoryStorage){
+				if(temp.freeSpace == true){
+					freeSpace job = new freeSpace(temp.size, temp.address, temp.job);
+					freeSpaceTable.add(job);
+				}
+			}
+	}
+	public static int addressFinder(int size){
+		int closet =  99;
+		int temp;
+		int address = 0;
+		boolean foundOne = false;
+		for(freeSpace job: freeSpaceTable){
+			temp = job.size - size;
+			if(temp <= closet && temp>=0){
+				closet = temp;
+				address = job.address;
+				foundOne = true;
+			}
+		}
+		if(foundOne != true){
+			closet = 99;
+			for(memoryLink job: memoryStorage){
+				if(job.busy != true){
+					temp = job.size - size;  
+					if(temp <= closet && temp >=0){
+						closet = temp;
+						address = job.address;
+					}
+				}
+			}
+		}
+	return address;
+	}
 }
+
+
+
+
+
+
+
+

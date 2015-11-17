@@ -1,37 +1,22 @@
-
-
-
 public class memoryLink {
 	
 	public int address;
 	public int size;
 	public int job;
-	boolean terminated;
+	boolean freeSpace;
+	boolean busy;
 	
-	public memoryLink next;
-	
-	public memoryLink(int address, int size, int job, boolean terminated){
+	public memoryLink(int address, int size, int job, boolean freeSpace, boolean busy){
 		this.address = address;
 		this.size = size;
 		this.job = job;
-		this.terminated = terminated;
+		this.freeSpace = freeSpace;
+		this.busy = busy;
 	}
-	
-	
-}
-class memoryLinkList{
-	public memoryLink firstLink; 
-	
-	memoryLinkList(){
-		firstLink = null;
+	public void freeSpace(boolean freeSpace){
+		this.freeSpace = freeSpace;
 	}
-	
-	public boolean isEmpty(){
-		return(firstLink == null);
-	}
-	
-	public void createFirstLink(int address, int size, int job, boolean terminated){
-		memoryLink newLink = new memoryLink(address, size, job, terminated);
-		newLink.next = newLink;
+	public void setBusy(boolean busy){
+		this.busy = busy;
 	}
 }
