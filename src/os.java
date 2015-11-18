@@ -4,6 +4,7 @@ import java.util.Vector;
 import java.util.Hashtable;
 import java.math.*;
 
+
 public class os {
 		
 	/*
@@ -30,9 +31,10 @@ public class os {
 
 	public static void startup(){
 		sos.ontrace();
-		System.out.print("gittest");
-		memoryLink first = new memoryLink(0,99,0,true, true);
+		memoryLink first = new memoryLink(-1,0,-1,false,true);
+		memoryLink memory = new memoryLink(0,99,0,true, true);
 		memoryStorage.addFirst(first);
+		memoryStorage.add(memory);
 	}
 	
 	//Interrupt handlers
@@ -93,8 +95,8 @@ public class os {
 		
 		freeSpaceTableBuilder();
 		p[2] = addressFinder(p[3]);
-			
-		
+		addTooMemory(p[2],p[3],p[1]);
+		merge();
 			Swap(p,0);
 			
 		}
@@ -141,6 +143,33 @@ public class os {
 		}
 	return address;
 	}
+	
+	public static void addTooMemory(int address, int size, int job){
+		memoryLink cell = new memoryLink(address, size - 1, job, false, false);
+		int index = 0;
+		for(memoryLink search: memoryStorage)
+			if(address == search.address){
+				index = memoryStorage.indexOf(search);
+				search.size -= size;
+				search.address = address;
+				System.out.println(search.address + " " + search.size);
+			}
+		memoryStorage.add(cell);
+	}
+	public static void merge(){
+		memoryLink test = memoryStorage.get(0);
+		for(int search = 0; search < memoryStorage.size(); search++){
+			if(search > 0){
+				if(test.freeSpace == true && memoryStorage.get(search).freeSpace == true){
+					memoryStorage.get(search).address = test.address;
+					memoryStorage.get(search).size = memoryStorage.get(search).size + test.size;
+					memoryStorage.remove(test);
+				}
+				test = memoryStorage.get(search);
+			}
+		}
+	}
+	public static void asdfghjkl;
 }
 
 
