@@ -10,6 +10,7 @@ public class  cpuScheduler {
 				job =(job) jobTable.get(index);
 				int max=job.getMax();
 				if (max>5){
+					
 					p[4]=5;
 					job.setMax(max=max-5);
 				}
