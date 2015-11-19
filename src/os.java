@@ -11,11 +11,12 @@ public class os {
 	 * index is used to push jobsID onto mask.
 	 */
 	// public static Vector<Vector<Integer>> JobTable = new Vector<Vector<Integer>>(50);
-	 public static ArrayList<int[]> JobTable=new ArrayList<int[]>(50);
+	 public static ArrayList<job> jobTable=new ArrayList<job>(50);
 	 public static int[] mask = new int [50];
-	 public static int index=0;
+	 public static int index=0;//used tell where to add jobs in job table
 	 public static int BAfreespace=0;//baseaddress of freespace
-
+	 public static int trans=0;
+	 public static boolean iopending=false;
 	 /*
 	  * array for memory management;
 	  */ 
@@ -39,17 +40,17 @@ public class os {
 	 */
 	public static void Crint (int []a, int[] p){
 		
-		if(MemoryManager(p) ==true){
-			p[2]=0;
-			BAfreespace+=p[3];// increase to point to new baseadress of free space
-			JobTable.add(p); //puts job onto jobtable
-			mask[index]=p[3];//puts job ID into mask 
-			index++;		 // increase index, incase we need to access it we know where it is in JT
-			a[0]= 1;		// set cpu to not run
-		}
+		job job = new job(p[1],p[2],p[3],p[4],p[5]);// create new job object
+		jobTable.add(index,job);// adds job to JobTable
+		index++;// increase index to where next job is going to coming in
+				
+		Swap(p,0); //job is swapped		
+		a[0]=1;
+
 	}
 
 	public static void Dskint (int []a, int []p){
+		iopending=false;
 		
 	}
 
@@ -57,38 +58,46 @@ public class os {
 	 * Drum interrup: transfer between Drum and memory is done
 	 */
 	public static void Drmint (int []a, int []p){
-		
+		if(trans == 0){
 		a[0]=2;
-		p[4]=5;// time slice
-
+		p[2]=BAfreespace;
+		cpuScheduler.roundRobin(jobTable,p,index-1);
+		}
+		else
+			a[0]=1;
 	}
 
 	public static void Tro (int []a, int []p){
-		
-		
-		a[0]=1;
-		p[2]=50;
-		Swap(p,1);
-
+			
+			cpuScheduler.roundRobin(jobTable,p,index-1);
+			a[0]=2;
+	
 		
 	}
 
 	public static void Svc (int []a, int []p){
-		if(a[0] == 5)
+		
+		if(a[0] == 5){
 			a[0]=1;
+			jobTable.remove(p);
+		}
 		else 
 			if(a[0] == 6){
+				iopending=true;
 				sos.siodisk(p[1]);
-			a[0]=2;
+				a[0]=2;
 			}
 			else
 				if(a[0] == 7){
+					if(iopending == true)
 					a[0]=1;
+					else{
+						System.out.print("MAY THEY NEVER BE OUR RIVAL");
+						a[0]=2;
+					}
 				}
-					
-				
-		
 	}
+
 	
 	//methods called by OS only
 	
@@ -113,6 +122,7 @@ public class os {
 	// 0 == from drum into memory
 	// 1== fron disk to drum?
 	public static void Swap(int[] p, int k){
+		trans=k;				//set trans to 0 or 1 so we can decide what to set a when drumint is called
 		sos.siodrum(p[1], p[3], 0, k);
 	}
 	
@@ -122,12 +132,7 @@ public class os {
 	 */
 	public static boolean firstFit(int jobSize){
 		 //subtract size from memory
-		
-		if(memoryleft >=jobSize ){
-			memoryleft-=jobSize;
 		return true;
-		}
-		else
-			return false;
+		
 	}
 }
