@@ -58,11 +58,11 @@ public class os {
 	 * Drum interrup: transfer between Drum and memory is done
 	 */
 	public static void Drmint (int []a, int []p){
-		if(trans == 0){
-		a[0]=2;
-		p[2]=BAfreespace;
-		cpuScheduler.roundRobin(jobTable,p,index-1);
-		}
+		if(trans == 0){//if it is in memory
+			cpuScheduler.roundRobin(jobTable,p,index-1);
+			a[0]=2;
+			p[2]=BAfreespace;	
+			}
 		else
 			a[0]=1;
 	}
@@ -84,6 +84,7 @@ public class os {
 		else 
 			if(a[0] == 6){
 				iopending=true;
+				cpuScheduler.roundRobin(jobTable,p,index-1);
 				sos.siodisk(p[1]);
 				a[0]=2;
 			}
