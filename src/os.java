@@ -17,6 +17,7 @@ public class os {
 	 public static int BAfreespace=0;//baseaddress of freespace
 	 public static int trans=0;
 	 public static boolean iopending=false;
+	 public static memoryLink memoryLink;
 	 /*
 	  * array for memory management;
 	  */ 
@@ -25,6 +26,7 @@ public class os {
 
 	public static void startup(){
 		sos.ontrace();
+		memoryLink = new memoryLink();
 		System.out.print("Long live our idols");
 
 	}
@@ -43,8 +45,8 @@ public class os {
 		job job = new job(p[1],p[2],p[3],p[4],p[5]);// create new job object
 		jobTable.add(index,job);// adds job to JobTable
 		index++;// increase index to where next job is going to coming in
-				
-		Swap(p,0); //job is swapped		
+		MemoryManager(p);	
+		//Swap(p,0); //job is swapped		
 		a[0]=1;
 
 	}
@@ -109,14 +111,20 @@ public class os {
 	 * and returns true
 	 * if not it returns false
 	 */
-	public  static boolean  MemoryManager(  int[] p){
-			
+	public static void MemoryManager(int[] p){
+			memoryLink.freeSpaceTableBuilder();
+			p[2] = memoryLink.addressFinder(p[3]);
+			memoryLink.addTooMemory(p[2],p[3],p[1]);
+			memoryLink.merge();
+			Swap(p,0);
+				/*
 			if(firstFit(p[3]) == true){
 			Swap(p,0);
 			return true;
 			}
 			else 
-				return false;			
+				return false;
+				*/			
 		}
 
 	// swap job in or out of memory
