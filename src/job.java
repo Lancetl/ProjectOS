@@ -9,7 +9,7 @@ public class job {
 	//variables needed to memoryLink
 	private int address;
 	private boolean freeSpace;
-	private boolean latched;
+	private boolean latched = false;
 	
 	public job(int jobID, int prio, int size, int max, int entered){
 		this.jobID = jobID;
