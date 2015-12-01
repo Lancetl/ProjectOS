@@ -25,7 +25,7 @@ public class os {
 	 
 
 	public static void startup(){
-		sos.ontrace();
+		//sos.ontrace();
 		memoryLink = new memoryLink();
 		System.out.print("Long live our idols");
 
@@ -41,7 +41,12 @@ public class os {
 	 * a job stored(
 	 */
 	public static void Crint (int []a, int[] p){
-		
+		memoryLink.printShit();
+		job job = new job(p[1],p[2],p[3],p[4],p[5]);// create new job object
+		jobTable.add(index,job);// adds job to JobTable
+		index++;// increase index to where next job is going to coming in
+						
+		//Swap(p,0); job is swapped	
 		
 		MemoryManager(p);	
 		//Swap(p,0); //job is swapped		
@@ -50,6 +55,8 @@ public class os {
 	}
 
 	public static void Dskint (int []a, int []p){
+		iopending=false;
+		
 		trackTime(p,1);
 		doIo(p,false);
 		System.out.println(print(p));
@@ -65,6 +72,7 @@ public class os {
 			trackTime(p,1);
 			cpuScheduler.roundRobin(jobTable,p,index-1);
 			a[0]=2;
+			p[2]=BAfreespace;	
 			p[2]=memoryLink.addressFinder(p[3]);
 			}
 		else{
@@ -86,11 +94,13 @@ public class os {
 			System.out.println("MAKUTA MATATA");
 			}
 			else{
+				memoryLink.Terminate(p[1]);
 				a[0]=1;
 			}
 		}
 			else{
 			a[0]=1;
+			memoryLink.Terminate(p[1]);
 			}
 	}
 	
@@ -100,11 +110,14 @@ public class os {
 			//trackTime(p,0);
 			a[0]=1;
 			jobTable.remove(p);
+			memoryLink.Terminate(p[1]);
 			System.out.println(print(p));
 			System.out.println("MAKUTA MATATA");
 		}
 		else 
 			if(a[0] == 6){
+				iopending=true;
+				cpuScheduler.roundRobin(jobTable,p,index-1);
 				doIo(p,true);
 				cpuScheduler.roundRobin(jobTable,p,index-1);//gives time quantum
 				sos.siodisk(p[1]);
@@ -114,6 +127,7 @@ public class os {
 			}
 			else
 				if(a[0] == 7){
+					if(iopending == true)
 					trackTime(p,0);
 					if(doingIo(p) == true)
 					a[0]=1;
