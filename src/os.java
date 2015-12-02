@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Vector;
 import java.util.Hashtable;
 
@@ -12,12 +13,16 @@ public class os {
 	 */
 	// public static Vector<Vector<Integer>> JobTable = new Vector<Vector<Integer>>(50);
 	 public static ArrayList<job> jobTable=new ArrayList<job>(50);
-	 public static int[] mask = new int [50];
+	 public static ArrayList<int[]> jobTable2=new ArrayList<int[]>(50);
+	  public static memoryLink memoryLink;
+	 
+	 //variables to use as flags
 	 public static int index=0;//used tell where to add jobs in job table
-	 public static int BAfreespace=0;//baseaddress of freespace
-	 public static int trans=0;
-	 public static boolean iopending=false;
-	 public static memoryLink memoryLink;
+	 public static int trans =0;
+	 public static int swapping=0;
+	 public static int longTermtracker=0;
+	 public static boolean Drumisbusy=false;
+	 
 	 /*
 	  * array for memory management;
 	  */ 
@@ -27,7 +32,6 @@ public class os {
 	public static void startup(){
 		sos.ontrace();
 		memoryLink = new memoryLink();
-		System.out.print("Long live our idols");
 
 	}
 	
@@ -42,36 +46,41 @@ public class os {
 	 */
 	public static void Crint (int []a, int[] p){
 		
-		
-		MemoryManager(p);	
-		//Swap(p,0); //job is swapped		
-		a[0]=1;
-
+		if(Drumisbusy == false){
+			Drumisbusy=true;
+		MemoryManager(p);
+		if (swapping==1){
+			a[0]=2;
+			p[2]=longTerm().getAddress();
+			p[3]=longTerm().getSize();
+		}
+		else
+			a[0]=2;
 	}
-
+	}
 	public static void Dskint (int []a, int []p){
 		trackTime(p,1);
 		doIo(p,false);
 		System.out.println(print(p));
-		System.out.println("MAKUTA MATATA");
+
 	}
 
 	/*
 	 * Drum interrup: transfer between Drum and memory is done
 	 */
 	public static void Drmint (int []a, int []p){
-		
-		if(trans == 0){//if it is in memory
+		Drumisbusy=false;
+		if(swapping == 0){//if it is in memory
 			trackTime(p,1);
 			cpuScheduler.roundRobin(jobTable,p,index-1);
 			a[0]=2;
 			p[2]=memoryLink.addressFinder(p[3]);
+			//swapping=1;
 			}
 		else{
 			a[0]=1;
 		}
-		System.out.println(print(p));
-		System.out.println("MAKUTA 5454 MATATA");
+
 		}
 
 	public static void Tro (int []a, int []p){
@@ -80,28 +89,38 @@ public class os {
 			trackTime(p,0);
 			trackTime(p,1);
 			if(timeup(p) == false){
-			cpuScheduler.roundRobin(jobTable,p,index-1);
-			a[0]=2;
-			System.out.println(print(p));
-			System.out.println("MAKUTA MATATA");
+				p=jobTable2.get(longTermtracker);
+				cpuScheduler.roundRobin(jobTable,p,index-1);
+				a[0]=2;
+				if(jobTable.size() >1)
+					longTermtracker++;
 			}
 			else{
+				memoryLink.Terminate(p[1]);
+				remove(p);
+				index--;
+				swapping=0;
 				a[0]=1;
 			}
 		}
 			else{
-			a[0]=1;
+				memoryLink.Terminate(p[1]);
+				remove(p);
+				index--;
+				swapping=0;
+				a[0]=1;
 			}
 	}
 	
 
 	public static void Svc (int []a, int []p){
 		if(a[0] == 5){
-			//trackTime(p,0);
 			a[0]=1;
-			jobTable.remove(p);
-			System.out.println(print(p));
-			System.out.println("MAKUTA MATATA");
+			swapping=0;
+			index--;
+			memoryLink.Terminate(p[1]);
+			remove(p);
+
 		}
 		else 
 			if(a[0] == 6){
@@ -109,8 +128,7 @@ public class os {
 				cpuScheduler.roundRobin(jobTable,p,index-1);//gives time quantum
 				sos.siodisk(p[1]);
 				a[0]=2;
-				System.out.println(print(p));
-				System.out.println("MAKUTA MATATA");
+	
 			}
 			else
 				if(a[0] == 7){
@@ -118,11 +136,8 @@ public class os {
 					if(doingIo(p) == true)
 					a[0]=1;
 					else{
-						System.out.print("MAY THEY NEVER BE OUR RIVAL");
 						a[0]=2; 
 					}
-				System.out.println(print(p));
-				System.out.println("MAKUTA MATATA");
 				}
 	}
 
@@ -137,7 +152,7 @@ public class os {
 	 * if not it returns false
 	 */
 	public static void MemoryManager(int[] p){
-		
+			jobTable2.add(p);
 			memoryLink.freeSpaceTableBuilder();
 			p[2] = memoryLink.addressFinder(p[3]);
 			memoryLink.addTooMemory(p[2],p[3],p[1]);
@@ -163,7 +178,7 @@ public class os {
 	// 1== fron disk to drum?
 	public static void Swap(int[] p, int k){
 		trans=k;				//set trans to 0 or 1 so we can decide what to set a when drumint is called
-		sos.siodrum(p[1], p[3], 0, k);
+		sos.siodrum(p[1], p[3], p[2], k);
 	}
 	
 	/*
@@ -214,6 +229,22 @@ public class os {
 			}
 		}
 		return false;
+	}
+	
+	//remove job from arraylist
+	public static void remove(int[] p){
+		ArrayList<job> list = new ArrayList<job>();
+		for (Iterator<job> iterator = jobTable.iterator(); iterator.hasNext(); ) {
+		    job temp = iterator.next();
+		    if (temp.getJobID() ==  p[1]) {
+		        iterator.remove();
+		    }
+		}
+		
+	}
+	
+	public static job longTerm(){
+		return jobTable.get(longTermtracker);
 	}
 	public static int print(int[] p){
 		
