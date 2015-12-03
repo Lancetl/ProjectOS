@@ -60,6 +60,7 @@ public class os {
 
 	public static void Dskint (int []a, int []p){
 		trackTime(p,1);
+		updateSecond(p);
 		doIo(p,false);
 		cpuScheduler.roundRobin(jobTable,p,index-1);
 		System.out.println(print(p));
@@ -202,7 +203,6 @@ public class os {
 	public static void doIo(int[] p, boolean val){
 		for(job temp : jobTable){
 			if(temp.getJobID() == p[1]){
-				temp.setSecondTracker(p[5]);
 				temp.setLatched(val);
 				memoryLink.setLatch(val, temp.getJobID());
 			}
@@ -264,6 +264,13 @@ public class os {
 				temp.setEntered(p[5]);
 		}
 		
+	}
+	
+	public static void updateSecond(int[] p){
+		for(job temp : jobTable){
+			if(temp.getJobID() == p[1])
+				temp.setSecondTracker(p[5]);
+		}
 	}
 	public static void setnewJob(int[] p){
 		for(job temp : jobTable){

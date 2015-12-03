@@ -25,7 +25,7 @@ public class  cpuScheduler {
 		if (job.isNewJob()==true)
 			p[4]=job.getAbsMax()-(p[5]-job.getEntered());
 			else
-				p[4]=p[5]-job.getSecondTracker()+job.getTimeOnCpu();
+				p[4]=job.getAbsMax()-((p[5]-job.getSecondTracker())+job.getTimeOnCpu());
 		
 	}
 }
