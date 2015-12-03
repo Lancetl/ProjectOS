@@ -19,9 +19,9 @@ public class os {
 	 //variables to use as flags
 	 public static int index=0;//used tell where to add jobs in job table
 	 public static int trans =0;
-	 public static int swapping=0;
+	 public static boolean jobIncore=false;
 	 public static int longTermtracker=0;
-	 public static boolean Drumisbusy=false;
+	 public static boolean drumisbusy=false;
 	 
 	 /*
 	  * array for memory management;
@@ -46,14 +46,16 @@ public class os {
 	 */
 	public static void Crint (int []a, int[] p){
 		MemoryManager(p);
-		if (swapping==1){ //set swapping to 1 so job in memeory can run if any
+		if (jobIncore == true){ //set swapping to 1 so job in memeory can run if any
 			a[0]=2;
 			p[2]=longTerm().getAddress();
 			p[3]=longTerm().getSize();
 		}
 		else{
+			
+			jobIncore=true;
 			a[0]=1;		//if no jobs are in memory
-			swapping=1; //set cpu to not idle and increase swap to 1 (since a job will be swapped in soon)
+			 //set cpu to not idle and increase swap to 1 (since a job will be swapped in soon)
 		}
 		
 	}
@@ -72,12 +74,13 @@ public class os {
 	 */
 	public static void Drmint (int []a, int []p){
 		updateEntered(p);
-		Drumisbusy=false;
-		if(swapping == 1){//if it is in memory
+		drumisbusy=false;
+		if(jobIncore == true){//if it is in memory
 			trackTime(p,1);
 			cpuScheduler.roundRobin(jobTable,p,index-1);
 			a[0]=2;
-			p[2]=memoryLink.addressFinder(p[3]);
+			p[2]=longTerm().getAddress();
+			p[3]=longTerm().getSize();
 			}
 		else{
 			a[0]=1;
@@ -94,23 +97,23 @@ public class os {
 				p=jobTable2.get(longTermtracker);
 				cpuScheduler.roundRobin(jobTable,p,index-1);
 				a[0]=2;
-				if(jobTable.size() >1)
-					longTermtracker++;
+				//if(memoryLink.freeSpaceTable.size() >1)
+					//longTermtracker++;
 			}
 			else{
 				memoryLink.Terminate(p[1]);
 				remove(p);
 				index--;
-				swapping=0;
 				a[0]=1;
+				jobIncore=false;
 			}
 		}
 			else{
 				memoryLink.Terminate(p[1]);
 				remove(p);
 				index--;
-				swapping=0;
 				a[0]=1;
+				jobIncore=false;
 			}
 	}
 	
@@ -118,10 +121,10 @@ public class os {
 	public static void Svc (int []a, int []p){
 		if(a[0] == 5){
 			a[0]=1;
-			swapping=0;
 			index--;
 			memoryLink.Terminate(p[1]);
 			remove(p);
+			jobIncore=false;
 
 		}
 		else 
@@ -167,10 +170,12 @@ public class os {
 			jobTable.add(index,job);// adds job to JobTable
 			index++;// increase index to where next job is going to coming in
 			
-			if (Drumisbusy == false){
-				Drumisbusy = true;
-				Swap(p,0);	 
+			if(drumisbusy ==false){
+				Swap(p,0);
+				drumisbusy=true;
 			}
+			drumisbusy=true;
+			
 			memoryLink.printShit();
 				/*
 			if(firstFit(p[3]) == true){

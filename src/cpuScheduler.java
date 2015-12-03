@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 public class  cpuScheduler {
 	
-	static int timeslice=25;
+	static int timeslice=100;
 
 	public static void roundRobin(ArrayList jobTable,int p[],int index){
 				job job;
