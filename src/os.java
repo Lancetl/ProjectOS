@@ -97,8 +97,8 @@ public class os {
 				p=jobTable2.get(longTermtracker);
 				cpuScheduler.roundRobin(jobTable,p,index-1);
 				a[0]=2;
-				//if(memoryLink.freeSpaceTable.size() >1)
-					//longTermtracker++;
+				if(memoryLink.freeSpaceTable.size() >1)
+					longTermtracker++;
 			}
 			else{
 				memoryLink.Terminate(p[1]);
