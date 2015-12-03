@@ -61,6 +61,7 @@ public class os {
 	public static void Dskint (int []a, int []p){
 		trackTime(p,1);
 		doIo(p,false);
+		cpuScheduler.roundRobin(jobTable,p,index-1);
 		System.out.println(print(p));
 
 	}
@@ -69,6 +70,7 @@ public class os {
 	 * Drum interrup: transfer between Drum and memory is done
 	 */
 	public static void Drmint (int []a, int []p){
+		updateEntered(p);
 		Drumisbusy=false;
 		if(swapping == 1){//if it is in memory
 			trackTime(p,1);
@@ -123,11 +125,13 @@ public class os {
 		}
 		else 
 			if(a[0] == 6){
+				
 				doIo(p,true);
-				cpuScheduler.roundRobin(jobTable,p,index-1);//gives time quantum
+				cpuScheduler.latchedroundRobin(jobTable,p,index-1);//gives time quantum
+				setnewJob(p);
 				sos.siodisk(p[1]);
 				a[0]=2;
-	
+				//updateTracker(p);
 			}
 			else
 				if(a[0] == 7){
@@ -151,6 +155,7 @@ public class os {
 	 * if not it returns false
 	 */
 	public static void MemoryManager(int[] p){
+			memoryLink.printShit();
 			jobTable2.add(p);
 			memoryLink.freeSpaceTableBuilder();
 			p[2] = memoryLink.addressFinder(p[3]);
@@ -161,9 +166,11 @@ public class os {
 			jobTable.add(index,job);// adds job to JobTable
 			index++;// increase index to where next job is going to coming in
 			
-			if (Drumisbusy == false)
-			Swap(p,0);
-			Drumisbusy=true;
+			if (Drumisbusy == false){
+				Drumisbusy = true;
+				Swap(p,0);	 
+			}
+			memoryLink.printShit();
 				/*
 			if(firstFit(p[3]) == true){
 			Swap(p,0);
@@ -194,8 +201,11 @@ public class os {
 	
 	public static void doIo(int[] p, boolean val){
 		for(job temp : jobTable){
-			if(temp.getJobID() == p[1])
+			if(temp.getJobID() == p[1]){
+				temp.setSecondTracker(p[5]);
 				temp.setLatched(val);
+				memoryLink.setLatch(val, temp.getJobID());
+			}
 		}
 	}
 	
@@ -246,6 +256,21 @@ public class os {
 	
 	public static job longTerm(){
 		return jobTable.get(longTermtracker);
+	}
+	
+	public static void updateEntered(int[] p){
+		for(job temp : jobTable){
+			if(temp.getJobID() == p[1])
+				temp.setEntered(p[5]);
+		}
+		
+	}
+	public static void setnewJob(int[] p){
+		for(job temp : jobTable){
+			if(temp.getJobID() == p[1]){
+				temp.setNewJob(false);
+			}
+		}
 	}
 	public static int print(int[] p){
 		

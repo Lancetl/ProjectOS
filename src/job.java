@@ -10,6 +10,8 @@ public class job {
 	private int timeOnCpu;
 	private int absMax;
 	private int cputracker;
+	private int secondTracker;
+	private boolean newJob;
 	
 	//variables needed to memoryLink
 	private int address;
@@ -26,6 +28,8 @@ public class job {
 		this.timeOnCpu = 0;
 		this.absMax= max;
 		this.cputracker = 0;
+		this.secondTracker=0;
+		this.newJob=true;
 	}
 	public job(int jobID, int size, int address, boolean freeSpace, boolean latched){
 		this.jobID = jobID;
@@ -112,6 +116,18 @@ public class job {
 	}
 	public void setCputracker(int cputracker) {
 		this.cputracker = cputracker;
+	}
+	public int getSecondTracker() {
+		return secondTracker;
+	}
+	public void setSecondTracker(int secondTracker) {
+		this.secondTracker = secondTracker;
+	}
+	public boolean isNewJob() {
+		return newJob;
+	}
+	public void setNewJob(boolean newJob) {
+		this.newJob = newJob;
 	}
 	
 }

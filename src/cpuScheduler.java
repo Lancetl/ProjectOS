@@ -1,20 +1,31 @@
 import java.util.ArrayList;
 
 
+import java.util.ArrayList;
+
+
 public class  cpuScheduler {
 	
-	static int timeslice=20;
+	static int timeslice=25;
 
 	public static void roundRobin(ArrayList jobTable,int p[],int index){
 				job job;
 				job =(job) jobTable.get(index);
-				int max=job.getMax();
-				if(max >timeslice){
-					p[4]=timeslice;
-				job.setMax(job.getMax()-timeslice);
+				int max=job.getTimeOnCpu();
+				if (job.getAbsMax()-job.getTimeOnCpu() < timeslice){
+					p[4]=job.getAbsMax()-job.getTimeOnCpu();
 				}
-				else
-					p[4]=job.getMax();
+					else
+						p[4]=timeslice;
+	}
+	
+	public static void latchedroundRobin(ArrayList jobTable,int p[],int index){
+		job job;
+		job =(job) jobTable.get(index);
+		if (job.isNewJob()==true)
+			p[4]=job.getAbsMax()-(p[5]-job.getEntered());
+			else
+				p[4]=p[5]-job.getSecondTracker()+job.getTimeOnCpu();
+		
 	}
 }
-			

@@ -60,7 +60,7 @@ public class memoryLink {
 			if(address == search.getAddress()){
 				index = memoryStorage.indexOf(search);
 				search.subSize(size);
-				search.setAddress(size);	
+				search.setAddress(size + address);	
 			}
 				memoryStorage.add(index, cell);		
 	}
@@ -86,6 +86,13 @@ public class memoryLink {
 		}
 		merge();
 	}
+	
+	public void setLatch(boolean var, int jobID){
+		for(job job: memoryStorage){
+		if(job.getJobID() == jobID)
+		job.setLatched(var);
+		}
+		}
 	//This will need to be deleted
 	public void printShit(){
 		System.out.println("\naddress      Size       Job       freeSpace? ");
