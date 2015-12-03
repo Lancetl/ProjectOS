@@ -45,19 +45,19 @@ public class os {
 	 * a job stored(
 	 */
 	public static void Crint (int []a, int[] p){
-		
-		if(Drumisbusy == false){
-			Drumisbusy=true;
 		MemoryManager(p);
-		if (swapping==1){
+		if (swapping==1){ //set swapping to 1 so job in memeory can run if any
 			a[0]=2;
 			p[2]=longTerm().getAddress();
 			p[3]=longTerm().getSize();
 		}
-		else
-			a[0]=2;
+		else{
+			a[0]=1;		//if no jobs are in memory
+			swapping=1; //set cpu to not idle and increase swap to 1 (since a job will be swapped in soon)
+		}
+		
 	}
-	}
+
 	public static void Dskint (int []a, int []p){
 		trackTime(p,1);
 		doIo(p,false);
@@ -70,12 +70,11 @@ public class os {
 	 */
 	public static void Drmint (int []a, int []p){
 		Drumisbusy=false;
-		if(swapping == 0){//if it is in memory
+		if(swapping == 1){//if it is in memory
 			trackTime(p,1);
 			cpuScheduler.roundRobin(jobTable,p,index-1);
 			a[0]=2;
 			p[2]=memoryLink.addressFinder(p[3]);
-			//swapping=1;
 			}
 		else{
 			a[0]=1;
@@ -162,7 +161,9 @@ public class os {
 			jobTable.add(index,job);// adds job to JobTable
 			index++;// increase index to where next job is going to coming in
 			
+			if (Drumisbusy == false)
 			Swap(p,0);
+			Drumisbusy=true;
 				/*
 			if(firstFit(p[3]) == true){
 			Swap(p,0);
