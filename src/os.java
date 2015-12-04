@@ -14,7 +14,7 @@ public class os {
 	// public static Vector<Vector<Integer>> JobTable = new Vector<Vector<Integer>>(50);
 	 public static ArrayList<job> jobTable=new ArrayList<job>(50);
 	 public static ArrayList<int[]> jobTable2=new ArrayList<int[]>(50);
-	  public static memoryLink memoryLink;
+	 public static memoryLink memoryLink;
 	 
 	 //variables to use as flags
 	 public static int index=0;//used tell where to add jobs in job table
@@ -23,6 +23,7 @@ public class os {
 	 public static int longTermtracker=0;
 	 public static boolean drumisbusy=false;
 	 
+	 public static int temps =0;
 	 /*
 	  * array for memory management;
 	  */ 
@@ -90,6 +91,8 @@ public class os {
 		}
 
 	public static void Tro (int []a, int []p){
+	
+		System.out.println(print(p));
 		
 		if(timeup(p) == false){
 			trackTime(p,0);
@@ -98,10 +101,9 @@ public class os {
 				p=jobTable2.get(longTermtracker);
 				cpuScheduler.roundRobin(jobTable,p,index-1);
 				a[0]=2;
-				//if(jobTable.size() >1)
-					//longTermtracker++;
 			}
 			else{
+				temps-=p[3];
 				memoryLink.Terminate(p[1]);
 				remove(p);
 				index--;
@@ -110,6 +112,7 @@ public class os {
 			}
 		}
 			else{
+				temps-=p[3];
 				memoryLink.Terminate(p[1]);
 				remove(p);
 				index--;
@@ -122,6 +125,7 @@ public class os {
 	public static void Svc (int []a, int []p){
 		if(a[0] == 5){
 			a[0]=1;
+			temps-=p[3];
 			index--;
 			memoryLink.Terminate(p[1]);
 			remove(p);
@@ -129,6 +133,7 @@ public class os {
 
 		}
 		else 
+			
 			if(a[0] == 6){
 				
 				doIo(p,true);
@@ -172,8 +177,8 @@ public class os {
 			index++;// increase index to where next job is going to coming in
 			
 			if(drumisbusy ==false){
-				if(p[1]==7)
-					p[2]=47;
+				p[2]= temps;
+				temps+=p[3];
 				Swap(p,0);
 				drumisbusy=true;
 			}
@@ -294,6 +299,6 @@ public class os {
 				return temp.getTimeOnCpu();
 			}
 		}
-		return 0;
+		return -1;
 	}
 }
