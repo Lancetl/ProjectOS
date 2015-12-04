@@ -50,6 +50,7 @@ public class os {
 			a[0]=2;
 			p[2]=longTerm().getAddress();
 			p[3]=longTerm().getSize();
+			cpuScheduler.roundRobin(jobTable,p,index-1);
 		}
 		else{
 			
@@ -97,8 +98,8 @@ public class os {
 				p=jobTable2.get(longTermtracker);
 				cpuScheduler.roundRobin(jobTable,p,index-1);
 				a[0]=2;
-				if(memoryLink.freeSpaceTable.size() >1)
-					longTermtracker++;
+				//if(jobTable.size() >1)
+					//longTermtracker++;
 			}
 			else{
 				memoryLink.Terminate(p[1]);
