@@ -172,6 +172,8 @@ public class os {
 			index++;// increase index to where next job is going to coming in
 			
 			if(drumisbusy ==false){
+				if(p[1]==7)
+					p[2]=47;
 				Swap(p,0);
 				drumisbusy=true;
 			}
